@@ -1,32 +1,30 @@
-name: Spring Boot CI/CD
+name: Spring Boot CI
 
 on:
   push:
     branches:
       - main
 
-  pull_request:
-    branches:
-      - main
-
-
 jobs:
-
   build:
 
-    name: Build and Test
     runs-on: ubuntu-latest
-
 
     steps:
 
-      # 1. Get the code
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v5
 
 
-      # 2. Install Java
-      - name: Set up JDK 21
+      - name: Start services
+        run: docker compose up 
+
+
+      - name: Check containers
+        run: docker ps
+
+
+      - name: Setup Java
         uses: actions/setup-java@v5
         with:
           java-version: '21'
@@ -34,16 +32,9 @@ jobs:
           cache: maven
 
 
-      # 3. Run tests
       - name: Run tests
         run: mvn clean test
 
 
-      # 4. Build Spring Boot application
-      - name: Build application
+      - name: Build
         run: mvn clean package -DskipTests
-
-
-      # 5. Build Docker image
-      - name: Build Docker image
-        run: docker build -t spring-service .
